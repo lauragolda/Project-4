@@ -1,0 +1,51 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="row mx-5" style="align-items: center;">
+    <h1 style="display: inline-block; margin-right: 20px;">{{ username }}</h1>
+    {% if user.is_authenticated %}
+        {% if user != user_profile %}
+            {% if isFollowing %}
+                <form action="{% url 'unfollow' %}" method="post" clas="col-2" style="display: inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="userfollow" value="{{ user_profile }}">
+                    <input type="submit" value="Unfollow" class="btn btn-dark">
+                </form>
+            {% else %}
+                <form action="{% url 'follow' %}" method="post" style="display: inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="userfollow" value="{{ user_profile }}">
+                    <input type="submit" value="Follow" class="btn btn-dark">
+                </form>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+    <div class="mx-5">
+        <div class="row d-flex">
+            <h5 class="col-1">Followers: {{ followers.count }}</h5>
+            <h5 class="col-1">Following: {{ following.count }}</h5>
+        </div>
+    </div>
+    <div class="all-posts" style="margin-top:20px;">
+        {% for post in posts %}
+            <div class="post mx-5" style="border: 0.1px solid rgb(201, 200, 200); max-width: 600px; margin-top:5px;">
+                <h5 class="username" style="font-size: 20px;"><a href="{% url 'profile' user_id=post.author.id %}">@{{ post.author }}</a></h5>
+                <h6 class="content" style="font-size: 15px;">{{ post.content }}</h6>
+                <p class="date" style="font-size: 15px; color: gray;">{{ post.date }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination d-flex justify-content-center">
+            {% if posts.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% if posts.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+{% endblock %}
